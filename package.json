@@ -1,0 +1,12 @@
+{
+  "name": "infraaisand",
+  "private": true,
+  "scripts": {
+    "test": "pnpm test --recursive --if-present",
+    "lint": "pnpm --recursive --if-present run lint"
+  },
+  "packageManager": "pnpm@9.15.5",
+  "devDependencies": {
+    "eslint-plugin-unused-imports": "^4.1.4"
+  }
+}

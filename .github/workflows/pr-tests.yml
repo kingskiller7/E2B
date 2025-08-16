@@ -1,0 +1,42 @@
+name: Run tests on PRs
+
+on: [workflow_call]
+
+jobs:
+  run-tests:
+    name: Run tests for ${{ matrix.package }}
+    runs-on: ubuntu-24.04
+    strategy:
+      matrix:
+        include:
+          - package: packages/api
+            test_path: ./...
+          - package: packages/client-proxy
+            test_path: ./...
+          - package: packages/docker-reverse-proxy
+            test_path: ./...
+          - package: packages/envd
+            test_path: ./...
+          - package: packages/orchestrator
+            test_path: ./...
+          - package: packages/shared
+            test_path: ./pkg/...
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Go
+        uses: ./.github/actions/go-setup-cache
+
+      - name: Go Build Cache Path
+        id: go-cache-paths
+        run: |
+          echo "go-build=$(go env GOCACHE)" >> $GITHUB_OUTPUT
+
+      - name: Go Build Cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.go-cache-paths.outputs.go-build }}
+          key: ${{ runner.os }}-go-build-${{ matrix.package }}-${{ hashFiles('**/go.sum', '**/go.mod') }}
+
+      - name: Run tests
+        working-directory: ${{ matrix.package }}
+        run: go test -v ${{ matrix.test_path }}
